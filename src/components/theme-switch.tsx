@@ -1,16 +1,16 @@
 import { useEffect } from 'react'
 import { IconCheck, IconMoon, IconSun } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
-import { useTheme } from '@/context/theme-context'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useTheme } from './theme-provider'
+import { Button } from './custom/button'
 
-export function ThemeSwitch() {
+export default function ThemeSwitch() {
   const { theme, setTheme } = useTheme()
 
   /* Update theme-color meta tag
@@ -18,11 +18,13 @@ export function ThemeSwitch() {
   useEffect(() => {
     const themeColor = theme === 'dark' ? '#020817' : '#fff'
     const metaThemeColor = document.querySelector("meta[name='theme-color']")
-    if (metaThemeColor) metaThemeColor.setAttribute('content', themeColor)
+    metaThemeColor && metaThemeColor.setAttribute('content', themeColor)
   }, [theme])
 
+  console.log(theme)
+
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' size='icon' className='scale-95 rounded-full'>
           <IconSun className='size-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />

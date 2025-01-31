@@ -5,14 +5,11 @@
 !/src
 !index.html
 !package.json
-!tailwind.config.js
 !tsconfig.json
 !tsconfig.node.json
 !vite.config.ts
 !.prettierrc
 !README.md
-!eslint.config.js
+!CHANGELOG.md
+!.eslintrc.cjs
 !postcss.config.js
-
-# Ignore auto generated routeTree.gen.ts
-/src/routeTree.gen.ts

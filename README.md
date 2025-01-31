@@ -13,8 +13,7 @@ I've been creating dashboard UIs at work and for my personal projects. I always 
 - Light/dark mode
 - Responsive
 - Accessible
-- With built-in Sidebar component
-- Global Search Command
+- Sidebar and header layouts
 - 10+ pages
 - Extra custom components
 
@@ -24,7 +23,7 @@ I've been creating dashboard UIs at work and for my personal projects. I always 
 
 **Build Tool:** [Vite](https://vitejs.dev/)
 
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
+**Routing:** [React Router](https://reactrouter.com/en/main)
 
 **Type Checking:** [TypeScript](https://www.typescriptlang.org/)
 
