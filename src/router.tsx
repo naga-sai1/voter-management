@@ -54,6 +54,18 @@ const router = createBrowserRouter([
       Component: (await import('./pages/voter-login')).default,
     }),
   },
+  {
+    path: '/create-poll',
+    lazy: async () => ({
+      Component: (await import('./pages/create-poll')).default,
+    }),
+  },
+  {
+    path: '/voter-polling',
+    lazy: async () => ({
+      Component: (await import('./pages/voter-polling')).default,
+    }),
+  },
 
   // Main routes
   {
