@@ -29,7 +29,6 @@ export default function AdminLogin() {
         // Redirect or handle success here
         localStorage.setItem('isAdmin', 'true')
         navigate('/admin-dashboard')
-
       } else {
         throw new Error('Invalid credentials')
       }
@@ -69,11 +68,20 @@ export default function AdminLogin() {
       {/* Right side */}
       <div className='flex items-center justify-center bg-gradient-to-br from-gray-900 to-black p-8'>
         <div className='w-full max-w-md space-y-8 rounded-2xl bg-white/5 p-8 backdrop-blur-sm'>
-          <div className='flex items-center gap-2 lg:hidden'>
-            <ShieldCheck className='h-8 w-8 text-violet-400' />
-            <span className='text-xl font-semibold text-white'>
-              Admin Portal
-            </span>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-2 lg:hidden'>
+              <ShieldCheck className='h-8 w-8 text-violet-400' />
+              <span className='text-xl font-semibold text-white'>
+                Admin Portal
+              </span>
+            </div>
+            <Button
+              variant='ghost'
+              className='text-gray-400 hover:bg-white/10 hover:text-white'
+              onClick={() => navigate('/')}
+            >
+              Back to Home
+            </Button>
           </div>
 
           <div className='space-y-2'>
@@ -147,8 +155,6 @@ export default function AdminLogin() {
             )}
           </form>
 
-          
-            
           <p className='text-center text-sm text-gray-400'>
             By clicking login, you agree to our{' '}
             <Link

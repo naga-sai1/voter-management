@@ -1,10 +1,42 @@
 import { createBrowserRouter } from 'react-router-dom'
+import { RootLayout } from '@/components/layouts/RootLayout'
+import Choose from '@/pages/choose'
+import VoterLogin from '@/pages/voter-login'
+import VoterPolling from '@/pages/voter-polling'
+import AdminLogin from '@/pages/admin-login'
+import AdminDashboard from '@/pages/admin-dashboard'
 import GeneralError from './pages/errors/general-error'
 import NotFoundError from './pages/errors/not-found-error'
 import MaintenanceError from './pages/errors/maintenance-error'
 import UnauthorisedError from './pages/errors/unauthorised-error.tsx'
 
 const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      {
+        path: '/',
+        element: <Choose />,
+      },
+      {
+        path: '/voter-login',
+        element: <VoterLogin />,
+      },
+      {
+        path: '/voter-polling',
+        element: <VoterPolling />,
+      },
+      {
+        path: '/admin-login',
+        element: <AdminLogin />,
+      },
+      {
+        path: '/admin-dashboard',
+        element: <AdminDashboard />,
+      },
+    ],
+  },
+
   // Auth routes
   {
     path: '/sign-in',
@@ -43,33 +75,9 @@ const router = createBrowserRouter([
     }),
   },
   {
-    path: '/admin-login',
-    lazy: async () => ({
-      Component: (await import('./pages/admin-login')).default,
-    }),
-  },
-  {
-    path: '/voter-login',
-    lazy: async () => ({
-      Component: (await import('./pages/voter-login')).default,
-    }),
-  },
-  {
     path: '/create-parties',
     lazy: async () => ({
       Component: (await import('./pages/create-parties/index.tsx')).default,
-    }),
-  },
-  {
-    path: '/voter-polling',
-    lazy: async () => ({
-      Component: (await import('./pages/voter-polling')).default,
-    }),
-  },
-  {
-    path: '/admin-dashboard',
-    lazy: async () => ({
-      Component: (await import('./pages/admin-dashboard')).default,
     }),
   },
   {

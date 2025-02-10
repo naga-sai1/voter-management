@@ -1,17 +1,18 @@
 import { useState } from 'react'
-import { Users } from 'lucide-react'
+import { Users, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/custom/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginVoter } from '@/api'
+import { useVoter } from '@/context/VoterContext'
 
 export default function VoterLogin() {
   const [aadhar, setAadhar] = useState('')
   const [phone, setPhone] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-
+  const { login } = useVoter()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,22 +21,27 @@ export default function VoterLogin() {
     setError('')
 
     try {
-      const formattedAadhar = aadhar.replace(/\s/g, ' ') // Ensure spaces are preserved
+      const formattedAadhar = aadhar.replace(/\s/g, ' ')
       const response = await loginVoter({
         aadhar: formattedAadhar,
         phone_no: phone,
       })
 
-      // Save voter data to localStorage
-      localStorage.setItem('voter', JSON.stringify(response.voter))
-      localStorage.setItem('isVoterLoggedIn', 'true')
+      // Verify blockchain info
+      if (response.blockchainInfo.verificationStatus !== 'VERIFIED') {
+        throw new Error('Blockchain verification failed')
+      }
 
-      // Handle successful login
+      // Store voter and blockchain data using context
+      login(response.voter, response.blockchainInfo)
+
       console.log('Login successful:', response)
-      navigate('/voter-polling') // Redirect to voting page
-    } catch (err) {
+      navigate('/voter-polling')
+    } catch (err: any) {
       setError(
-        'Invalid credentials. Please check your Aadhar and phone number.'
+        err.message === 'Blockchain verification failed'
+          ? 'Security verification failed. Please try again.'
+          : 'Invalid credentials. Please check your Aadhar and phone number.'
       )
       console.error('Login failed:', err)
     } finally {
@@ -89,11 +95,20 @@ export default function VoterLogin() {
       {/* Right side */}
       <div className='flex items-center justify-center bg-gradient-to-br from-gray-900 to-black p-8'>
         <div className='w-full max-w-md space-y-8 rounded-2xl bg-white/5 p-8 backdrop-blur-sm'>
-          <div className='flex items-center gap-2 lg:hidden'>
-            <Users className='h-8 w-8 text-cyan-400' />
-            <span className='text-xl font-semibold text-white'>
-              Voter Portal
-            </span>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-2 lg:hidden'>
+              <Users className='h-8 w-8 text-cyan-400' />
+              <span className='text-xl font-semibold text-white'>
+                Voter Portal
+              </span>
+            </div>
+            <Button
+              variant='ghost'
+              className='text-gray-400 hover:bg-white/10 hover:text-white'
+              onClick={() => navigate('/')}
+            >
+              Back to Home
+            </Button>
           </div>
 
           <div className='space-y-2'>
@@ -135,7 +150,9 @@ export default function VoterLogin() {
             </div>
 
             {error && (
-              <p className='text-center text-sm text-red-400'>{error}</p>
+              <div className='flex items-center gap-2 rounded-lg bg-red-500/10 p-3'>
+                <p className='text-center text-sm text-red-400'>{error}</p>
+              </div>
             )}
 
             <Button
@@ -143,7 +160,14 @@ export default function VoterLogin() {
               className='w-full bg-cyan-600 text-white hover:bg-cyan-700'
               disabled={isLoading}
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? (
+                'Verifying...'
+              ) : (
+                <span className='flex items-center gap-2'>
+                  <ShieldCheck className='h-4 w-4' />
+                  Secure Login
+                </span>
+              )}
             </Button>
           </form>
 

@@ -11,21 +11,17 @@ const api = axios.create({
   },
 })
 
-
 export const partyWiseVotingCount = () =>
   api.get('/party-wise-voting-count').then((response) => response.data)
 
 export const castVote = (data: any) =>
   api.post('/cast_vote', data).then((response) => response.data)
 
-
 export const getAllParties = () =>
   api.get('/get_all_parties').then((response) => response.data)
 
-
 export const loginVoter = (data: { aadhar: string; phone_no: string }) =>
   api.post('/login_voter', data).then((response) => response.data)
-
 
 export const getAllStates = () =>
   api.get('/get_all_states').then((response) => response.data)
