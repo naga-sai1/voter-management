@@ -1,14 +1,44 @@
-
 import { useState } from 'react'
 
 import { ShieldCheck, Github, Facebook, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/custom/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false)
+  const [userId, setUserId] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const navigate = useNavigate()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setErrorMessage('')
+
+    // Simulated API call
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+
+      // Dummy validation
+      if (userId === 'admin123' && password === 'Admin@123') {
+        console.log('Login successful')
+        // Redirect or handle success here
+        localStorage.setItem('isAdmin', 'true')
+        navigate('/admin-dashboard')
+
+      } else {
+        throw new Error('Invalid credentials')
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Login failed')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className='grid min-h-screen bg-[#0A0F1C] lg:grid-cols-2'>
@@ -53,7 +83,7 @@ export default function AdminLogin() {
             </p>
           </div>
 
-          <form className='space-y-6'>
+          <form className='space-y-6' onSubmit={handleSubmit}>
             <div className='space-y-2'>
               <Label htmlFor='userId' className='text-gray-200'>
                 User ID
@@ -63,6 +93,8 @@ export default function AdminLogin() {
                 type='text'
                 placeholder='admin@example.com'
                 className='border-white/20 bg-white/10 text-white placeholder:text-gray-500'
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
               />
             </div>
 
@@ -83,6 +115,8 @@ export default function AdminLogin() {
                   id='password'
                   type={showPassword ? 'text' : 'password'}
                   className='border-white/20 bg-white/10 pr-10 text-white'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <Button
                   type='button'
@@ -103,52 +137,29 @@ export default function AdminLogin() {
             <Button
               type='submit'
               className='w-full bg-violet-600 text-white hover:bg-violet-700'
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
+
+            {errorMessage && (
+              <p className='text-center text-sm text-red-400'>{errorMessage}</p>
+            )}
           </form>
 
-          <div className='space-y-6'>
-            <div className='relative'>
-              <div className='absolute inset-0 flex items-center'>
-                <div className='w-full border-t border-white/10' />
-              </div>
-              <div className='relative flex justify-center text-xs uppercase'>
-                <span className='bg-transparent px-2 text-gray-500'>
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className='grid grid-cols-2 gap-4'>
-              <Button
-                variant='outline'
-                className='border-white/10 bg-white/5 text-white hover:bg-white/10'
-              >
-                <Github className='mr-2 h-4 w-4' />
-                GitHub
-              </Button>
-              <Button
-                variant='outline'
-                className='border-white/10 bg-white/5 text-white hover:bg-white/10'
-              >
-                <Facebook className='mr-2 h-4 w-4' />
-                Facebook
-              </Button>
-            </div>
-          </div>
-
+          
+            
           <p className='text-center text-sm text-gray-400'>
             By clicking login, you agree to our{' '}
-            <Link to='/terms'
-              
+            <Link
+              to='/terms'
               className='text-violet-400 underline hover:text-violet-300'
             >
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to='/privacy'
-            
+            <Link
+              to='/privacy'
               className='text-violet-400 underline hover:text-violet-300'
             >
               Privacy Policy

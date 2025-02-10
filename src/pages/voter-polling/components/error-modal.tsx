@@ -4,16 +4,17 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 interface ErrorModalProps {
   isOpen: boolean
   onClose: () => void
+  message: string
 }
 
-export function ErrorModal({ isOpen, onClose }: ErrorModalProps) {
+export function ErrorModal({ isOpen, onClose, message }: ErrorModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gradient-to-br from-[#0A0F1C] to-[#1A2035] text-white border-red-400">
         <DialogHeader>
           <DialogTitle className="text-3xl font-bold text-red-400">Vote Submission Failed</DialogTitle>
           <DialogDescription className="text-xl text-gray-300">
-            There was an error submitting your vote. Please try again later.
+            {message}
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center mt-6">

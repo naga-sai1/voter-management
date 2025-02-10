@@ -66,6 +66,12 @@ const router = createBrowserRouter([
       Component: (await import('./pages/voter-polling')).default,
     }),
   },
+  {
+    path: '/admin-dashboard',
+    lazy: async () => ({
+      Component: (await import('./pages/admin-dashboard')).default,
+    }),
+  },
 
   // Main routes
   {

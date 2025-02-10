@@ -1,0 +1,237 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import {
+  BarChart,
+  Users,
+  VoteIcon,
+  ArrowUpRight,
+  ArrowDownRight,
+  ChevronDown,
+  Plus,
+  LogOut,
+} from 'lucide-react'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/custom/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useNavigate } from 'react-router-dom'
+import { partyWiseVotingCount } from '@/api'
+
+// Mock data for demonstration
+// const stats = [
+//   {
+//     title: 'Total Voters',
+//     value: 10234,
+//     icon: Users,
+//     change: 12.5,
+//     increasing: true,
+//   },
+//   {
+//     title: 'Total Votes Cast',
+//     value: 8756,
+//     icon: VoteIcon,
+//     change: 8.2,
+//     increasing: true,
+//   },
+//   {
+//     title: 'Parties Registered',
+//     value: 6,
+//     icon: BarChart,
+//     change: 0,
+//     increasing: false,
+//   },
+// ]
+
+const partyData = [
+  {
+    name: 'Party A',
+    votes: 3245,
+    percentage: 37.06,
+    logo: '/placeholder.svg?height=40&width=40',
+  },
+  {
+    name: 'Party B',
+    votes: 2890,
+    percentage: 33.01,
+    logo: '/placeholder.svg?height=40&width=40',
+  },
+  {
+    name: 'Party C',
+    votes: 1621,
+    percentage: 18.51,
+    logo: '/placeholder.svg?height=40&width=40',
+  },
+  {
+    name: 'Party D',
+    votes: 680,
+    percentage: 7.77,
+    logo: '/placeholder.svg?height=40&width=40',
+  },
+  {
+    name: 'Party E',
+    votes: 320,
+    percentage: 3.65,
+    logo: '/placeholder.svg?height=40&width=40',
+  },
+]
+
+export default function AdminDashboard() {
+  const [selectedPeriod, setSelectedPeriod] = useState('This Week')
+  const navigate = useNavigate()
+  const isAdmin = localStorage.getItem('isAdmin')
+  const [partyStats, setPartyStats] = useState<any[]>([])
+  const [totalVotes, setTotalVotes] = useState(0)
+  const [totalVoters, setTotalVoters] = useState(0)
+  const [votingPercentage, setVotingPercentage] = useState(0)
+  const handleLogout = () => {
+    localStorage.removeItem('isAdmin')
+    navigate('/')
+  }
+
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/admin-login')
+    }
+  }, [isAdmin, navigate])
+
+  useEffect(() => {
+    // Fetch party stats
+    const fetchPartyStats = async () => {
+      try {
+        const response = await partyWiseVotingCount()
+        const data = response as { statistics: any[]; totalVotesCast: number,totalVoters:number, votingPercentage:number }
+        setPartyStats(data.statistics)
+        setTotalVotes(data.totalVotesCast)
+        setTotalVoters(data.totalVoters)
+        setVotingPercentage(data.votingPercentage)
+      } catch (error) {
+        console.error('Error fetching party stats:', error)
+      }
+    }
+
+    fetchPartyStats()
+  }, [])
+
+  return (
+    <div className='min-h-screen bg-gradient-to-br from-[#0A0F1C] to-[#1A1F2C] p-8'>
+      <div className='mx-auto max-w-7xl'>
+        <div className='mb-8 flex items-center justify-between'>
+          <h1 className='text-3xl font-bold text-white'>Admin Dashboard</h1>
+          <div className='flex items-center gap-4'>
+            <Button
+              onClick={() => navigate('/create-poll')}
+              className='bg-violet-600 text-white hover:bg-violet-700'
+            >
+              <Plus className='mr-2 h-4 w-4' />
+              Create New Poll
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant='outline'
+              className='border-red-500/20 text-red-500 hover:bg-red-500/10'
+            >
+              <LogOut className='mr-2 h-4 w-4' />
+              Logout
+            </Button>
+           
+          </div>
+        </div>
+
+        <div className='mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+          <Card className='border-white/20 bg-white/5'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-gray-300'>Total Votes Cast</CardTitle>
+              <VoteIcon className='h-4 w-4 text-violet-400' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-white'>{totalVotes}</div>
+            </CardContent>
+          </Card>
+
+          <Card className='border-white/20 bg-white/5'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-gray-300'>Total Voters</CardTitle>
+              <Users className='h-4 w-4 text-violet-400' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-white'>{totalVoters}</div>
+            </CardContent>
+          </Card>
+
+          <Card className='border-white/20 bg-white/5'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-gray-300'>Voting Percentage</CardTitle>
+              <BarChart className='h-4 w-4 text-violet-400' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-white'>{votingPercentage}%</div>
+            </CardContent>
+          </Card>
+
+          <Card className='border-white/20 bg-white/5'>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-gray-300'>Parties Registered</CardTitle>
+              <BarChart className='h-4 w-4 text-violet-400' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-white'>{partyStats.length}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className='border-white/20 bg-white/5'>
+          <CardHeader>
+            <CardTitle className='text-xl font-bold text-white'>
+              Party-wise Voting Count
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Party Name</TableHead>
+                  <TableHead>Logo</TableHead>
+                  <TableHead>Votes</TableHead>
+                  <TableHead>Percentage</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {partyStats.map((party) => (
+                  <TableRow key={party.id}>
+                    <TableCell>{party.name}</TableCell>
+                    <TableCell>
+                      <img
+                        src={party.logo}
+                        alt={`${party.name} logo`}
+                        className='h-10 w-10 rounded-full object-cover'
+                      />
+                    </TableCell>
+                    <TableCell>{party.votes}</TableCell>
+                    <TableCell>{party.percentage}%</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

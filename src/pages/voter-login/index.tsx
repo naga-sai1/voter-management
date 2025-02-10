@@ -1,14 +1,64 @@
-
 import { useState } from 'react'
-
-import { Users, Github, Facebook, Eye, EyeOff } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { Button } from '@/components/custom/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { loginVoter } from '@/api'
 
 export default function VoterLogin() {
-  const [showPassword, setShowPassword] = useState(false)
+  const [aadhar, setAadhar] = useState('')
+  const [phone, setPhone] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const formattedAadhar = aadhar.replace(/\s/g, ' ') // Ensure spaces are preserved
+      const response = await loginVoter({
+        aadhar: formattedAadhar,
+        phone_no: phone,
+      })
+
+      // Save voter data to localStorage
+      localStorage.setItem('voter', JSON.stringify(response.voter))
+      localStorage.setItem('isVoterLoggedIn', 'true')
+
+      // Handle successful login
+      console.log('Login successful:', response)
+      navigate('/voter-polling') // Redirect to voting page
+    } catch (err) {
+      setError(
+        'Invalid credentials. Please check your Aadhar and phone number.'
+      )
+      console.error('Login failed:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Format Aadhar number as user types (XXXX XXXX XXXX)
+  const handleAadharChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '') // Remove non-digits
+    const formattedValue =
+      value
+        .match(/.{1,4}/g)
+        ?.join(' ')
+        .substr(0, 14) || ''
+    setAadhar(formattedValue)
+  }
+
+  // Format phone number as user types
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').substr(0, 10)
+    setPhone(value)
+  }
 
   return (
     <div className='grid min-h-screen bg-[#0A0F1C] lg:grid-cols-2'>
@@ -49,94 +99,53 @@ export default function VoterLogin() {
           <div className='space-y-2'>
             <h1 className='text-3xl font-bold text-white'>Voter Login</h1>
             <p className='text-gray-400'>
-              Enter your voter ID and password to access your account
+              Enter your Aadhar number and phone number to access your account
             </p>
           </div>
 
-          <form className='space-y-6'>
+          <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='space-y-2'>
-              <Label htmlFor='voter-id' className='text-gray-200'>
-                Voter ID
+              <Label htmlFor='aadhar' className='text-gray-200'>
+                Aadhar Number
               </Label>
               <Input
-                id='voter-id'
+                id='aadhar'
                 type='text'
-                placeholder='Enter your voter ID'
+                value={aadhar}
+                onChange={handleAadharChange}
+                placeholder='XXXX XXXX XXXX'
                 className='border-white/20 bg-white/10 text-white placeholder:text-gray-500'
+                required
               />
             </div>
 
             <div className='space-y-2'>
-              <div className='flex items-center justify-between'>
-                <Label htmlFor='password' className='text-gray-200'>
-                  Password
-                </Label>
-                <Button
-                  variant='link'
-                  className='px-0 text-cyan-400 hover:text-cyan-300'
-                >
-                  Forgot password?
-                </Button>
-              </div>
-              <div className='relative'>
-                <Input
-                  id='password'
-                  type={showPassword ? 'text' : 'password'}
-                  className='border-white/20 bg-white/10 pr-10 text-white'
-                />
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='sm'
-                  className='absolute right-0 top-0 h-full px-3 py-2 text-gray-400 hover:bg-transparent hover:text-white'
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className='h-4 w-4' />
-                  ) : (
-                    <Eye className='h-4 w-4' />
-                  )}
-                </Button>
-              </div>
+              <Label htmlFor='phone' className='text-gray-200'>
+                Phone Number
+              </Label>
+              <Input
+                id='phone'
+                type='tel'
+                value={phone}
+                onChange={handlePhoneChange}
+                placeholder='Enter your phone number'
+                className='border-white/20 bg-white/10 text-white placeholder:text-gray-500'
+                required
+              />
             </div>
+
+            {error && (
+              <p className='text-center text-sm text-red-400'>{error}</p>
+            )}
 
             <Button
               type='submit'
               className='w-full bg-cyan-600 text-white hover:bg-cyan-700'
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
-
-          <div className='space-y-6'>
-            <div className='relative'>
-              <div className='absolute inset-0 flex items-center'>
-                <div className='w-full border-t border-white/10' />
-              </div>
-              <div className='relative flex justify-center text-xs uppercase'>
-                <span className='bg-transparent px-2 text-gray-500'>
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className='grid grid-cols-2 gap-4'>
-              <Button
-                variant='outline'
-                className='border-white/10 bg-white/5 text-white hover:bg-white/10'
-              >
-                <Github className='mr-2 h-4 w-4' />
-                GitHub
-              </Button>
-              <Button
-                variant='outline'
-                className='border-white/10 bg-white/5 text-white hover:bg-white/10'
-              >
-                <Facebook className='mr-2 h-4 w-4' />
-                Facebook
-              </Button>
-            </div>
-          </div>
 
           <p className='text-center text-sm text-gray-400'>
             By clicking login, you agree to our{' '}
