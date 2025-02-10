@@ -54,13 +54,14 @@ const formSchema = z.object({
   partyLogo: z.instanceof(File).optional(),
 })
 
-function CreatePoll() {
+  function CreateParty() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [progress, setProgress] = useState(0)
   const [states, setStates] = useState<
+
     Array<{ id: number; name: string; abbreviation: string }>
   >([])
 
@@ -150,7 +151,7 @@ function CreatePoll() {
           >
             <ShieldCheck className='h-8 w-8 text-violet-400' />
             <span className='text-2xl font-semibold text-white'>
-              Create Voting Poll
+              Create Voting Party
             </span>
           </motion.div>
 
@@ -376,4 +377,4 @@ function CreatePoll() {
   )
 }
 
-export default CreatePoll
+export default CreateParty

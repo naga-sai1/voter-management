@@ -92,10 +92,30 @@ const partyData = [
   },
 ]
 
+// Add or update the interface for the statistics
+interface PartyStatistics {
+  id: number
+  name: string
+  logo: string
+  state_id: number
+  state_name: string
+  votes: number
+  percentage: string
+}
+
+interface VotingCountResponse {
+  message: string
+  totalVoters: number
+  totalVotesCast: number
+  votingPercentage: number
+  statistics: PartyStatistics[]
+}
+
 export default function AdminDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('This Week')
   const navigate = useNavigate()
   const isAdmin = localStorage.getItem('isAdmin')
+  const [votingData, setVotingData] = useState<VotingCountResponse | null>(null)
   const [partyStats, setPartyStats] = useState<any[]>([])
   const [totalVotes, setTotalVotes] = useState(0)
   const [totalVoters, setTotalVoters] = useState(0)
@@ -112,15 +132,14 @@ export default function AdminDashboard() {
   }, [isAdmin, navigate])
 
   useEffect(() => {
-    // Fetch party stats
     const fetchPartyStats = async () => {
       try {
-        const response = await partyWiseVotingCount()
-        const data = response as { statistics: any[]; totalVotesCast: number,totalVoters:number, votingPercentage:number }
-        setPartyStats(data.statistics)
-        setTotalVotes(data.totalVotesCast)
-        setTotalVoters(data.totalVoters)
-        setVotingPercentage(data.votingPercentage)
+        const response = await partyWiseVotingCount() as VotingCountResponse
+        setVotingData(response)
+        setPartyStats(response.statistics)
+        setTotalVotes(response.totalVotesCast)
+        setTotalVoters(response.totalVoters)
+        setVotingPercentage(response.votingPercentage)
       } catch (error) {
         console.error('Error fetching party stats:', error)
       }
@@ -136,11 +155,18 @@ export default function AdminDashboard() {
           <h1 className='text-3xl font-bold text-white'>Admin Dashboard</h1>
           <div className='flex items-center gap-4'>
             <Button
-              onClick={() => navigate('/create-poll')}
+              onClick={() => navigate('/conduct-poll')}
+              className='bg-cyan-600 text-white hover:bg-cyan-700'
+            >
+              <VoteIcon className='mr-2 h-4 w-4' />
+              Conduct Poll
+            </Button>
+            <Button
+              onClick={() => navigate('/create-parties')}
               className='bg-violet-600 text-white hover:bg-violet-700'
             >
               <Plus className='mr-2 h-4 w-4' />
-              Create New Poll
+              Create New Party
             </Button>
             <Button
               onClick={handleLogout}
@@ -150,48 +176,47 @@ export default function AdminDashboard() {
               <LogOut className='mr-2 h-4 w-4' />
               Logout
             </Button>
-           
           </div>
         </div>
 
         <div className='mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-          <Card className='border-white/20 bg-white/5'>
+          <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-gray-300'>Total Votes Cast</CardTitle>
-              <VoteIcon className='h-4 w-4 text-violet-400' />
+              <CardTitle className='text-sm font-medium'>
+                Total Voters
+              </CardTitle>
+              <Users className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold text-white'>{totalVotes}</div>
+              <div className='text-2xl font-bold'>
+                {votingData?.totalVoters || 0}
+              </div>
             </CardContent>
           </Card>
-
-          <Card className='border-white/20 bg-white/5'>
+          <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-gray-300'>Total Voters</CardTitle>
-              <Users className='h-4 w-4 text-violet-400' />
+              <CardTitle className='text-sm font-medium'>
+                Total Votes Cast
+              </CardTitle>
+              <VoteIcon className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold text-white'>{totalVoters}</div>
+              <div className='text-2xl font-bold'>
+                {votingData?.totalVotesCast || 0}
+              </div>
             </CardContent>
           </Card>
-
-          <Card className='border-white/20 bg-white/5'>
+          <Card>
             <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-gray-300'>Voting Percentage</CardTitle>
-              <BarChart className='h-4 w-4 text-violet-400' />
+              <CardTitle className='text-sm font-medium'>
+                Voting Percentage
+              </CardTitle>
+              <ArrowUpRight className='h-4 w-4 text-muted-foreground' />
             </CardHeader>
             <CardContent>
-              <div className='text-2xl font-bold text-white'>{votingPercentage}%</div>
-            </CardContent>
-          </Card>
-
-          <Card className='border-white/20 bg-white/5'>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium text-gray-300'>Parties Registered</CardTitle>
-              <BarChart className='h-4 w-4 text-violet-400' />
-            </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold text-white'>{partyStats.length}</div>
+              <div className='text-2xl font-bold'>
+                {votingData?.votingPercentage || '0.00'}%
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -207,22 +232,16 @@ export default function AdminDashboard() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Party Name</TableHead>
-                  <TableHead>Logo</TableHead>
+                  <TableHead>State</TableHead>
                   <TableHead>Votes</TableHead>
                   <TableHead>Percentage</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {partyStats.map((party) => (
+                {votingData?.statistics.map((party) => (
                   <TableRow key={party.id}>
-                    <TableCell>{party.name}</TableCell>
-                    <TableCell>
-                      <img
-                        src={party.logo}
-                        alt={`${party.name} logo`}
-                        className='h-10 w-10 rounded-full object-cover'
-                      />
-                    </TableCell>
+                    <TableCell className='font-medium'>{party.name}</TableCell>
+                    <TableCell>{party.state_name}</TableCell>
                     <TableCell>{party.votes}</TableCell>
                     <TableCell>{party.percentage}%</TableCell>
                   </TableRow>

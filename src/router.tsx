@@ -55,9 +55,9 @@ const router = createBrowserRouter([
     }),
   },
   {
-    path: '/create-poll',
+    path: '/create-parties',
     lazy: async () => ({
-      Component: (await import('./pages/create-poll')).default,
+      Component: (await import('./pages/create-parties/index.tsx')).default,
     }),
   },
   {
@@ -70,6 +70,12 @@ const router = createBrowserRouter([
     path: '/admin-dashboard',
     lazy: async () => ({
       Component: (await import('./pages/admin-dashboard')).default,
+    }),
+  },
+  {
+    path: '/conduct-poll',
+    lazy: async () => ({
+      Component: (await import('./pages/conduct-poll')).default,
     }),
   },
 
