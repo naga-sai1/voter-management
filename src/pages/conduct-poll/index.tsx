@@ -10,6 +10,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/custom/button'
 import {
@@ -36,8 +37,10 @@ import {
 } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { getAllStates, getAllParties } from '@/api'
+import { getAllStates, getAllParties, conductPoll } from '@/api'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
 
 interface Party {
   id: number
@@ -49,12 +52,28 @@ interface Party {
 }
 
 const formSchema = z.object({
-  state: z.string({
-    required_error: 'Please select a state.',
+  name: z.string().min(2, {
+    message: 'Poll name must be at least 2 characters.',
   }),
-  parties: z.array(z.string()).min(2, {
-    message: 'Please select at least 2 parties.',
+  description: z.string().optional(),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'Start date must be in YYYY-MM-DD format',
   }),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+    message: 'End date must be in YYYY-MM-DD format',
+  }),
+  state_parties: z
+    .array(
+      z.object({
+        state_id: z.string().transform(Number),
+        party_list: z.array(z.string().transform(Number)).min(1, {
+          message: 'Select at least 1 party per state',
+        }),
+      })
+    )
+    .min(1, {
+      message: 'Add at least one state-party combination',
+    }),
 })
 
 export default function ConductPoll() {
@@ -66,14 +85,19 @@ export default function ConductPoll() {
   const [parties, setParties] = useState<Party[]>([])
   const [selectedState, setSelectedState] = useState<string>('')
   const [filteredParties, setFilteredParties] = useState<Party[]>([])
-
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      state: '',
-      parties: [],
+      name: '',
+      description: '',
+      start_date: '',
+      end_date: '',
+      state_parties: [],
     },
   })
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,15 +134,22 @@ export default function ConductPoll() {
         setProgress(Math.min(progressValue, 90))
       }, 200)
 
-      // TODO: Implement API call to start the poll
-      // await startPoll({
-      //   state_id: values.state,
-      //   party_ids: values.parties,
-      // })
+      await conductPoll({
+        name: values.name,
+        description: values.description,
+        start_date: values.start_date,
+        end_date: values.end_date,
+        state_parties: values.state_parties.map((sp) => ({
+          state_id: sp.state_id,
+          party_list: sp.party_list,
+        })),
+      })
 
       setProgress(100)
       clearInterval(interval)
       setShowSuccessModal(true)
+      form.reset()
+      navigate('/admin-dashboard')
     } catch (error) {
       console.error('Failed to start poll:', error)
       setShowErrorModal(true)
@@ -157,91 +188,214 @@ export default function ConductPoll() {
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
               <FormField
                 control={form.control}
-                name='state'
+                name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Select State</FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(value)
-                        setSelectedState(value)
-                      }}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'>
-                          <SelectValue placeholder='Select a state' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {states.map((state) => (
-                          <SelectItem
-                            key={state.id}
-                            value={state.id.toString()}
-                          >
-                            {state.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel className='text-gray-200'>Poll Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Enter poll name'
+                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {selectedState && (
-                <FormField
-                  control={form.control}
-                  name='parties'
-                  render={() => (
-                    <FormItem>
-                      <FormLabel className='text-gray-200'>
-                        Select Parties (minimum 2)
-                      </FormLabel>
-                      <div className='space-y-4'>
-                        {filteredParties.map((party) => (
-                          <div
-                            key={party.id}
-                            className='flex items-center space-x-4 rounded-lg border border-white/10 bg-white/5 p-4'
+              <FormField
+                control={form.control}
+                name='description'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-gray-200'>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder='Optional poll description'
+                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='start_date'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-gray-200'>Start Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='date'
+                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='end_date'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-gray-200'>End Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='date'
+                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='state_parties'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-gray-200'>
+                      State-Party Combinations
+                    </FormLabel>
+                    {field.value.map((_, index) => (
+                      <div
+                        key={index}
+                        className='mb-6 rounded-lg border border-white/10 p-4'
+                      >
+                        <div className='mb-4 flex justify-between'>
+                          <FormLabel className='text-gray-300'>
+                            Group #{index + 1}
+                          </FormLabel>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            className='text-red-400 hover:bg-white/5'
+                            onClick={() => {
+                              const updated = [...field.value]
+                              updated.splice(index, 1)
+                              field.onChange(updated)
+                            }}
                           >
-                            <Checkbox
-                              id={party.id.toString()}
-                              onCheckedChange={(checked) => {
-                                const currentValues =
-                                  form.getValues().parties || []
-                                const newValues = checked
-                                  ? [...currentValues, party.id.toString()]
-                                  : currentValues.filter(
-                                      (value) => value !== party.id.toString()
-                                    )
-                                form.setValue('parties', newValues)
-                              }}
-                            />
-                            <div className='flex flex-1 items-center space-x-4'>
-                              {party.logo && (
-                                <img
-                                  src={party.logo}
-                                  alt={party.name}
-                                  className='h-10 w-10 rounded-full object-cover'
-                                />
-                              )}
-                              <div>
-                                <p className='text-sm font-medium text-white'>
-                                  {party.name}
-                                </p>
-                                <p className='text-xs text-gray-400'>
-                                  {party.abbreviation}
-                                </p>
+                            Remove
+                          </Button>
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name={`state_parties.${index}.state_id`}
+                          render={({ field }) => (
+                            <FormItem className='mb-4'>
+                              <FormLabel className='text-gray-300'>
+                                State
+                              </FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className='border-white/20 bg-white/10 text-white'>
+                                    <SelectValue placeholder='Select a state' />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {states.map((state) => (
+                                    <SelectItem
+                                      key={state.id}
+                                      value={state.id.toString()}
+                                    >
+                                      {state.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`state_parties.${index}.party_list`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className='text-gray-300'>
+                                Parties
+                              </FormLabel>
+                              <div className='space-y-2'>
+                                {parties
+                                  .filter(
+                                    (p) =>
+                                      p.state_id.toString() ===
+                                      form.getValues().state_parties[index]
+                                        ?.state_id
+                                  )
+                                  .map((party) => (
+                                    <div
+                                      key={party.id}
+                                      className='flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 p-3'
+                                    >
+                                      <Checkbox
+                                        checked={field.value?.includes(
+                                          party.id.toString()
+                                        )}
+                                        onCheckedChange={(checked) => {
+                                          const current = field.value || []
+                                          const newValue = checked
+                                            ? [...current, party.id.toString()]
+                                            : current.filter(
+                                                (v) => v !== party.id.toString()
+                                              )
+                                          field.onChange(newValue)
+                                        }}
+                                      />
+                                      <div className='flex items-center space-x-3'>
+                                        {party.logo && (
+                                          <img
+                                            src={party.logo}
+                                            alt={party.name}
+                                            className='h-8 w-8 rounded-full object-cover'
+                                          />
+                                        )}
+                                        <span className='text-sm text-white'>
+                                          {party.name} ({party.abbreviation})
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
                               </div>
-                            </div>
-                          </div>
-                        ))}
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+                    ))}
+
+                    <Button
+                      type='button'
+                      variant='outline'
+                      className='w-full border-white/20 text-white hover:bg-white/10'
+                      onClick={() =>
+                        field.onChange([
+                          ...field.value,
+                          { state_id: '', party_list: [] },
+                        ])
+                      }
+                    >
+                      Add State-Party Combination
+                    </Button>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <Button
                 type='submit'
@@ -276,7 +430,16 @@ export default function ConductPoll() {
       {/* Success Modal */}
       <AnimatePresence>
         {showSuccessModal && (
-          <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+          <Dialog
+            open={showSuccessModal}
+            onOpenChange={(open) => {
+              if (!open) {
+                form.reset()
+                navigate('/admin-dashboard')
+              }
+              setShowSuccessModal(open)
+            }}
+          >
             <DialogContent className='bg-[#0A0F1C] text-white sm:max-w-[425px]'>
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -290,14 +453,12 @@ export default function ConductPoll() {
                     Poll Started Successfully
                   </DialogTitle>
                   <DialogDescription className='text-gray-300'>
-                    The poll has been started for the selected state and parties.
+                    The poll has been started for the selected state and
+                    parties.
                   </DialogDescription>
                 </DialogHeader>
                 <div className='mt-4 flex justify-end'>
-                  <Button
-                    onClick={() => setShowSuccessModal(false)}
-                    className='bg-violet-600 hover:bg-violet-700'
-                  >
+                  <Button className='bg-violet-600 hover:bg-violet-700'>
                     Close
                   </Button>
                 </div>
@@ -342,4 +503,4 @@ export default function ConductPoll() {
       </AnimatePresence>
     </div>
   )
-} 
+}

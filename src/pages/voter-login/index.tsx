@@ -27,16 +27,13 @@ export default function VoterLogin() {
         phone_no: phone,
       })
 
-      // Verify blockchain info
-      if (response.blockchainInfo.verificationStatus !== 'VERIFIED') {
-        throw new Error('Blockchain verification failed')
-      }
-
-      // Store voter and blockchain data using context
-      login(response.voter, response.blockchainInfo)
+      localStorage.setItem(
+        'voter',
+        JSON.stringify({ aadhar: formattedAadhar, phone_no: phone })
+      )
 
       console.log('Login successful:', response)
-      navigate('/voter-polling')
+      navigate('/otp-verification')
     } catch (err: any) {
       setError(
         err.message === 'Blockchain verification failed'

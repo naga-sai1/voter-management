@@ -1,7 +1,8 @@
 import axios from 'axios'
 
-const baseURL = 'http://192.168.0.107:5001/'
+const baseURL = 'http://192.168.0.105:5001/'
 
+// const baseURL = 'http://localhost:5001/'
 // const baseURL = 'https://apiroutekkmart.invtechnologies.in/'
 //
 const api = axios.create({
@@ -10,6 +11,15 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+export const getAllPolls = (id: number) =>
+  api.get(`/get_all_polls/${id}`).then((response) => response.data)
+
+export const verifyOtp = (data: any) =>
+  api.post('/verify_otp', data).then((response) => response.data)
+
+export const conductPoll = (data: any) =>
+  api.post('/conduct_poll', data).then((response) => response.data)
 
 export const partyWiseVotingCount = () =>
   api.get('/party-wise-voting-count').then((response) => response.data)

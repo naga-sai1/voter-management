@@ -34,6 +34,12 @@ const router = createBrowserRouter([
         path: '/admin-dashboard',
         element: <AdminDashboard />,
       },
+      {
+        path: '/otp-verification',
+        lazy: async () => ({
+          Component: (await import('./pages/otp-verfication')).default,
+        }),
+      },
     ],
   },
 
