@@ -39,6 +39,7 @@ export default function VoterPolling() {
   const [polls, setPolls] = useState<Poll[]>([])
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
+  const [selectedPollId, setSelectedPollId] = useState<number | null>(null)
 
   const voter = localStorage.getItem('voter')
     ? JSON.parse(localStorage.getItem('voter')!)
@@ -55,8 +56,17 @@ export default function VoterPolling() {
   useEffect(() => {
     const fetchPolls = async () => {
       try {
+        setLoading(true)
         const response = await getAllPolls(voter.state_id)
-        setPolls(response.polls)
+        if (response.success) {
+          setPolls(response.polls || [])
+          if (response.polls?.length > 0) {
+            setSelectedPollId(response.polls[0].poll_id)
+          }
+        } else {
+          setErrorMessage(response.message || 'Failed to fetch polls')
+          setShowErrorModal(true)
+        }
       } catch (error) {
         console.error('Error fetching polls:', error)
         setErrorMessage('Failed to fetch polls. Please try again.')
@@ -73,24 +83,26 @@ export default function VoterPolling() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (selectedParty && voter && polls.length > 0) {
-      try {
-        const response = await castVote({
-          voter_id: voter.id,
-          party_id: parseInt(selectedParty),
-          poll_id: polls[0].poll_id
-        })
+    if (!selectedParty || !voter || !selectedPollId) return
 
-        if (response.success) {
-          setShowSuccessModal(true)
-        } else {
-          setErrorMessage(response.message || 'Failed to cast vote')
-          setShowErrorModal(true)
-        }
-      } catch (error: any) {
-        setErrorMessage(error.response?.data?.message || 'Failed to cast vote')
+    try {
+      const response = await castVote({
+        voter_id: voter.id,
+        party_id: parseInt(selectedParty),
+        poll_id: selectedPollId,
+        state_id: voter.state_id
+      })
+
+      if (response.success) {
+        setShowSuccessModal(true)
+      } else {
+        setErrorMessage(response.message || 'Failed to cast vote')
         setShowErrorModal(true)
       }
+    } catch (error: any) {
+      console.error('Error casting vote:', error)
+      setErrorMessage(error.response?.data?.message || 'Failed to cast vote')
+      setShowErrorModal(true)
     }
   }
 
@@ -107,6 +119,9 @@ export default function VoterPolling() {
     return null
   }
 
+  const selectedPoll = polls.find(poll => poll.poll_id === selectedPollId)
+  const today = new Date()
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -119,53 +134,78 @@ export default function VoterPolling() {
       {polls.length > 0 ? (
         <form onSubmit={handleSubmit}>
           <div className="space-y-6">
-            {polls.map((poll) => (
-              <Card key={poll.poll_id} className="w-full">
+            <div className="mb-4">
+              <label htmlFor="poll-select" className="block text-sm font-medium text-gray-700 mb-2">
+                Select Poll
+              </label>
+              <select
+                id="poll-select"
+                className="w-full p-2 border rounded"
+                value={selectedPollId || ''}
+                onChange={(e) => {
+                  const newPollId = Number(e.target.value)
+                  setSelectedPollId(newPollId)
+                  setSelectedParty('')
+                }}
+              >
+                {polls.map((poll) => (
+                  <option key={poll.poll_id} value={poll.poll_id}>
+                    {poll.name} ({new Date(poll.start_date).toLocaleDateString()} - {new Date(poll.end_date).toLocaleDateString()})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {selectedPoll && (
+              <Card className="w-full">
                 <CardContent className="p-6">
                   <div className="mb-4">
-                    <h2 className="text-2xl font-semibold">{poll.name}</h2>
+                    <h2 className="text-2xl font-semibold">{selectedPoll.name}</h2>
                     <p className="text-gray-600">
-                      State: {poll.state.name} ({poll.state.abbreviation})
+                      State: {selectedPoll.state.name} ({selectedPoll.state.abbreviation})
                     </p>
                     <p className="text-gray-600">
-                      Duration: {new Date(poll.start_date).toLocaleDateString()} - {new Date(poll.end_date).toLocaleDateString()}
+                      Duration: {new Date(selectedPoll.start_date).toLocaleDateString()} - {new Date(selectedPoll.end_date).toLocaleDateString()}
                     </p>
                   </div>
 
-                  <RadioGroup
-                    value={selectedParty}
-                    onValueChange={setSelectedParty}
-                    className="space-y-4"
-                  >
-                    {poll.parties.map((party) => (
-                      <div
-                        key={party.party_id}
-                        className="flex items-center space-x-4 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
-                      >
-                        <RadioGroupItem
-                          value={party.party_id.toString()}
-                          id={party.party_id.toString()}
-                        />
-                        <div className="flex items-center space-x-4 flex-1">
-                          {party.logo ? (
-                            <img
-                              src={party.logo}
-                              alt={party.name}
-                              className="w-12 h-12 object-contain"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                              <Shield className="w-6 h-6 text-gray-400" />
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium mb-4">Select Party to Vote</h3>
+                    <RadioGroup
+                      value={selectedParty}
+                      onValueChange={setSelectedParty}
+                      className="space-y-4"
+                    >
+                      {selectedPoll.parties.map((party) => (
+                        <div
+                          key={party.party_id}
+                          className="flex items-center space-x-4 border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                        >
+                          <RadioGroupItem
+                            value={party.party_id.toString()}
+                            id={party.party_id.toString()}
+                          />
+                          <div className="flex items-center space-x-4 flex-1">
+                            {party.logo ? (
+                              <img
+                                src={party.logo}
+                                alt={party.name}
+                                className="w-12 h-12 object-contain"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                                <Shield className="w-6 h-6 text-gray-400" />
+                              </div>
+                            )}
+                            <div>
+                              <h3 className="font-medium">{party.name}</h3>
+                              <p className="text-sm text-gray-500">{party.abbreviation}</p>
                             </div>
-                          )}
-                          <div>
-                            <h3 className="font-medium">{party.name}</h3>
-                            <p className="text-sm text-gray-500">{party.abbreviation}</p>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                      ))}
+                    </RadioGroup>
+                  </div>
 
                   <Button
                     type="submit"
@@ -176,7 +216,7 @@ export default function VoterPolling() {
                   </Button>
                 </CardContent>
               </Card>
-            ))}
+            )}
           </div>
         </form>
       ) : (

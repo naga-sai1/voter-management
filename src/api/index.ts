@@ -12,7 +12,46 @@ const api = axios.create({
   },
 })
 
-export const getAllPolls = (id: number) =>
+interface Party {
+  party_id: number
+  name: string
+  abbreviation: string
+  logo: string | null
+}
+
+interface State {
+  id: string
+  name: string
+  abbreviation: string
+}
+
+interface Poll {
+  poll_id: number
+  name: string
+  start_date: string
+  end_date: string
+  state: State
+  parties: Party[]
+}
+
+interface GetPollsResponse {
+  message: string
+  polls: Poll[]
+}
+
+interface CastVoteRequest {
+  voter_id: number
+  party_id: number
+  poll_id: number
+  state_id: number
+}
+
+interface CastVoteResponse {
+  success: boolean
+  message: string
+}
+
+export const getAllPolls = (id: number): Promise<GetPollsResponse> =>
   api.get(`/get_all_polls/${id}`).then((response) => response.data)
 
 export const verifyOtp = (data: any) =>
@@ -24,7 +63,7 @@ export const conductPoll = (data: any) =>
 export const partyWiseVotingCount = () =>
   api.get('/party-wise-voting-count').then((response) => response.data)
 
-export const castVote = (data: any) =>
+export const castVote = (data: CastVoteRequest): Promise<CastVoteResponse> =>
   api.post('/cast_vote', data).then((response) => response.data)
 
 export const getAllParties = () =>

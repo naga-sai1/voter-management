@@ -51,6 +51,11 @@ interface Party {
   state_name: string
 }
 
+interface State {
+  id: number
+  name: string
+}
+
 const formSchema = z.object({
   name: z.string().min(2, {
     message: 'Poll name must be at least 2 characters.',
@@ -62,30 +67,22 @@ const formSchema = z.object({
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'End date must be in YYYY-MM-DD format',
   }),
-  state_parties: z
-    .array(
-      z.object({
-        state_id: z.string().transform(Number),
-        party_list: z.array(z.string().transform(Number)).min(1, {
-          message: 'Select at least 1 party per state',
-        }),
-      })
-    )
-    .min(1, {
-      message: 'Add at least one state-party combination',
-    }),
+  state_id: z.string(),
+  party_list: z.array(z.number()).min(1, {
+    message: 'Select at least 1 party',
+  }),
 })
 
 export default function ConductPoll() {
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [showErrorModal, setShowErrorModal] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [states, setStates] = useState<Array<{ id: number; name: string }>>([])
   const [parties, setParties] = useState<Party[]>([])
+  const [states, setStates] = useState<State[]>([])
   const [selectedState, setSelectedState] = useState<string>('')
   const [filteredParties, setFilteredParties] = useState<Party[]>([])
-  
+  const [loading, setLoading] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -93,69 +90,71 @@ export default function ConductPoll() {
       description: '',
       start_date: '',
       end_date: '',
-      state_parties: [],
-    },
+      state_id: '',
+      party_list: []
+    }
   })
 
-  const navigate = useNavigate()
+  const watchedState = form.watch('state_id')
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statesResponse, partiesResponse] = await Promise.all([
-          getAllStates(),
+        setLoading(true)
+        const [partiesRes, statesRes] = await Promise.all([
           getAllParties(),
+          getAllStates()
         ])
-        setStates(statesResponse.states)
-        setParties(partiesResponse.parties)
+        setParties(partiesRes.parties || [])
+        setStates(statesRes.states || [])
       } catch (error) {
-        console.error('Failed to fetch data:', error)
+        console.error('Error fetching data:', error)
+        setErrorMessage('Failed to fetch data. Please try again.')
+        setShowErrorModal(true)
+      } finally {
+        setLoading(false)
       }
     }
+
     fetchData()
   }, [])
 
-  // Filter parties when state is selected
   useEffect(() => {
-    if (selectedState) {
-      const filtered = parties.filter(
-        (party) => party.state_id.toString() === selectedState
-      )
-      setFilteredParties(filtered)
-    }
-  }, [selectedState, parties])
+    const stateId = form.getValues().state_id
+    console.log('Current state_id:', stateId)
+    console.log('All parties:', parties)
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true)
-    try {
-      let progressValue = 0
-      const interval = setInterval(() => {
-        progressValue += 10
-        setProgress(Math.min(progressValue, 90))
-      }, 200)
-
-      await conductPoll({
-        name: values.name,
-        description: values.description,
-        start_date: values.start_date,
-        end_date: values.end_date,
-        state_parties: values.state_parties.map((sp) => ({
-          state_id: sp.state_id,
-          party_list: sp.party_list,
-        })),
+    if (stateId) {
+      const filtered = parties.filter(party => {
+        const partyStateId = party.state_id?.toString()
+        const formStateId = stateId?.toString()
+        console.log(`Comparing party state_id: ${partyStateId} with form state_id: ${formStateId}`)
+        return partyStateId === formStateId
       })
+      console.log('Filtered parties:', filtered)
+      setFilteredParties(filtered)
+    } else {
+      setFilteredParties([])
+    }
+  }, [watchedState, parties])
 
-      setProgress(100)
-      clearInterval(interval)
-      setShowSuccessModal(true)
-      form.reset()
-      navigate('/admin-dashboard')
-    } catch (error) {
-      console.error('Failed to start poll:', error)
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setLoading(true)
+      const response = await conductPoll(values)
+      if (response.success) {
+        setShowSuccessModal(true)
+        form.reset()
+      } else {
+        setErrorMessage(response.message || 'Failed to conduct poll')
+        setShowErrorModal(true)
+      }
+    } catch (error: any) {
+      console.error('Error conducting poll:', error)
+      setErrorMessage(error.response?.data?.message || 'Failed to conduct poll')
       setShowErrorModal(true)
     } finally {
-      setIsSubmitting(false)
-      setProgress(0)
+      setLoading(false)
     }
   }
 
@@ -260,138 +259,74 @@ export default function ConductPoll() {
 
               <FormField
                 control={form.control}
-                name='state_parties'
+                name='state_id'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>
-                      State-Party Combinations
-                    </FormLabel>
-                    {field.value.map((_, index) => (
-                      <div
-                        key={index}
-                        className='mb-6 rounded-lg border border-white/10 p-4'
+                    <FormLabel className='text-gray-200'>State</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value)
+                          setSelectedState(value)
+                        }}
+                        value={field.value}
                       >
-                        <div className='mb-4 flex justify-between'>
-                          <FormLabel className='text-gray-300'>
-                            Group #{index + 1}
-                          </FormLabel>
-                          <Button
-                            type='button'
-                            variant='ghost'
-                            className='text-red-400 hover:bg-white/5'
-                            onClick={() => {
-                              const updated = [...field.value]
-                              updated.splice(index, 1)
-                              field.onChange(updated)
-                            }}
+                        <SelectTrigger className='border-white/20 bg-white/10 text-white'>
+                          <SelectValue placeholder='Select a state' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {states.map((state) => (
+                            <SelectItem key={state.id} value={state.id}>
+                              {state.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='party_list'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-gray-200'>Parties</FormLabel>
+                    <FormControl>
+                      <div className='space-y-2'>
+                        {filteredParties.map((party) => (
+                          <div
+                            key={party.id}
+                            className='flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 p-3'
                           >
-                            Remove
-                          </Button>
-                        </div>
-
-                        <FormField
-                          control={form.control}
-                          name={`state_parties.${index}.state_id`}
-                          render={({ field }) => (
-                            <FormItem className='mb-4'>
-                              <FormLabel className='text-gray-300'>
-                                State
-                              </FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                              >
-                                <FormControl>
-                                  <SelectTrigger className='border-white/20 bg-white/10 text-white'>
-                                    <SelectValue placeholder='Select a state' />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {states.map((state) => (
-                                    <SelectItem
-                                      key={state.id}
-                                      value={state.id.toString()}
-                                    >
-                                      {state.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`state_parties.${index}.party_list`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className='text-gray-300'>
-                                Parties
-                              </FormLabel>
-                              <div className='space-y-2'>
-                                {parties
-                                  .filter(
-                                    (p) =>
-                                      p.state_id.toString() ===
-                                      form.getValues().state_parties[index]
-                                        ?.state_id
-                                  )
-                                  .map((party) => (
-                                    <div
-                                      key={party.id}
-                                      className='flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 p-3'
-                                    >
-                                      <Checkbox
-                                        checked={field.value?.includes(
-                                          party.id.toString()
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          const current = field.value || []
-                                          const newValue = checked
-                                            ? [...current, party.id.toString()]
-                                            : current.filter(
-                                                (v) => v !== party.id.toString()
-                                              )
-                                          field.onChange(newValue)
-                                        }}
-                                      />
-                                      <div className='flex items-center space-x-3'>
-                                        {party.logo && (
-                                          <img
-                                            src={party.logo}
-                                            alt={party.name}
-                                            className='h-8 w-8 rounded-full object-cover'
-                                          />
-                                        )}
-                                        <span className='text-sm text-white'>
-                                          {party.name} ({party.abbreviation})
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ))}
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            <Checkbox
+                              checked={field.value?.includes(party.id)}
+                              onCheckedChange={(checked) => {
+                                const current = field.value || []
+                                const newValue = checked
+                                  ? [...current, party.id]
+                                  : current.filter((v) => v !== party.id)
+                                field.onChange(newValue)
+                              }}
+                            />
+                            <div className='flex items-center space-x-3'>
+                              {party.logo && (
+                                <img
+                                  src={party.logo}
+                                  alt={party.name}
+                                  className='h-8 w-8 rounded-full object-cover'
+                                />
+                              )}
+                              <span className='text-sm text-white'>
+                                {party.name} ({party.abbreviation})
+                              </span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-
-                    <Button
-                      type='button'
-                      variant='outline'
-                      className='w-full border-white/20 text-white hover:bg-white/10'
-                      onClick={() =>
-                        field.onChange([
-                          ...field.value,
-                          { state_id: '', party_list: [] },
-                        ])
-                      }
-                    >
-                      Add State-Party Combination
-                    </Button>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -400,28 +335,28 @@ export default function ConductPoll() {
               <Button
                 type='submit'
                 className='w-full bg-violet-600 text-white transition-colors hover:bg-violet-700'
-                disabled={isSubmitting}
+                disabled={loading}
               >
-                {isSubmitting ? (
+                {loading ? (
                   <>
                     <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Starting Poll...
+                    Conducting Poll...
                   </>
                 ) : (
-                  'Start Poll'
+                  'Conduct Poll'
                 )}
               </Button>
             </form>
           </Form>
 
-          {isSubmitting && (
+          {loading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className='mt-4'
             >
-              <Progress value={progress} className='w-full' />
+              <Progress value={50} className='w-full' />
             </motion.div>
           )}
         </CardContent>
@@ -435,7 +370,6 @@ export default function ConductPoll() {
             onOpenChange={(open) => {
               if (!open) {
                 form.reset()
-                navigate('/admin-dashboard')
               }
               setShowSuccessModal(open)
             }}
@@ -482,10 +416,10 @@ export default function ConductPoll() {
                 <DialogHeader>
                   <DialogTitle className='flex items-center gap-2'>
                     <XCircle className='h-6 w-6 text-red-500' />
-                    Failed to Start Poll
+                    Failed to Conduct Poll
                   </DialogTitle>
                   <DialogDescription className='text-gray-300'>
-                    There was an error starting the poll. Please try again.
+                    {errorMessage}
                   </DialogDescription>
                 </DialogHeader>
                 <div className='mt-4 flex justify-end'>
