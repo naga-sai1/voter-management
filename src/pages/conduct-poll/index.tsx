@@ -60,7 +60,9 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: 'Poll name must be at least 2 characters.',
   }),
-  description: z.string().optional(),
+  description: z.string().min(2, {
+    message: 'Poll description must be at least 2 characters.',
+  }),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'Start date must be in YYYY-MM-DD format',
   }),
@@ -142,13 +144,9 @@ export default function ConductPoll() {
     try {
       setLoading(true)
       const response = await conductPoll(values)
-      if (response.success) {
-        setShowSuccessModal(true)
-        form.reset()
-      } else {
-        setErrorMessage(response.message || 'Failed to conduct poll')
-        setShowErrorModal(true)
-      }
+
+      setShowSuccessModal(true)
+      form.reset()
     } catch (error: any) {
       console.error('Error conducting poll:', error)
       setErrorMessage(error.response?.data?.message || 'Failed to conduct poll')
@@ -272,11 +270,13 @@ export default function ConductPoll() {
                         value={field.value}
                       >
                         <SelectTrigger className='border-white/20 bg-white/10 text-white'>
-                          <SelectValue placeholder='Select a state' />
+                          <SelectValue placeholder='Select a state'>
+                            {states.find(state => state.id.toString() === field.value)?.name}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {states.map((state) => (
-                            <SelectItem key={state.id} value={state.id}>
+                            <SelectItem key={state.id} value={state.id.toString()}>
                               {state.name}
                             </SelectItem>
                           ))}

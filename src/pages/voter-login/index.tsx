@@ -14,6 +14,7 @@ export default function VoterLogin() {
   const [error, setError] = useState('')
   const { login } = useVoter()
   const navigate = useNavigate()
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

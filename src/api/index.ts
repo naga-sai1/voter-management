@@ -36,6 +36,7 @@ interface Poll {
 
 interface GetPollsResponse {
   message: string
+  success: boolean
   polls: Poll[]
 }
 
@@ -51,6 +52,9 @@ interface CastVoteResponse {
   message: string
 }
 
+export const resetAllPolls = () =>
+  api.delete('/reset_all_polls').then((response) => response.data)
+
 export const getAllPolls = (id: number): Promise<GetPollsResponse> =>
   api.get(`/get_all_polls/${id}`).then((response) => response.data)
 
@@ -63,7 +67,7 @@ export const conductPoll = (data: any) =>
 export const partyWiseVotingCount = () =>
   api.get('/party-wise-voting-count').then((response) => response.data)
 
-export const castVote = (data: CastVoteRequest): Promise<CastVoteResponse> =>
+export const castVote = (data: any) =>
   api.post('/cast_vote', data).then((response) => response.data)
 
 export const getAllParties = () =>
