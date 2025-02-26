@@ -60,20 +60,13 @@ export default function VoterPolling() {
         setLoading(true)
         const response = await getAllPolls(voter.state_id)
 
-        // Filter active polls
-        const today = new Date()
-        const activePolls =
-          response.polls?.filter((poll) => {
-            const startDate = new Date(poll.start_date)
-            const endDate = new Date(poll.end_date)
-            return today >= startDate && today <= endDate
-          }) || []
+        // Get polls without filtering
+        const polls = response.polls || []
+        setPolls(polls)
 
-        setPolls(activePolls)
-
-        // Automatically select the first active poll
-        if (activePolls.length > 0) {
-          setSelectedPollId(activePolls[0].poll_id)
+        // Automatically select the first poll if available
+        if (polls.length > 0) {
+          setSelectedPollId(polls[0].poll_id)
         }
       } catch (error) {
         console.error('Error fetching polls:', error)
