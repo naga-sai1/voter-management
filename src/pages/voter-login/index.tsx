@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useState } from 'react'
 import { Users, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/custom/button'

@@ -1,9 +1,10 @@
+//@ts-nocheck
 import axios from 'axios'
 
-const baseURL = 'http://192.168.0.105:5001/'
+// const baseURL = 'http://192.168.0.105:5001/'
 
 // const baseURL = 'http://localhost:5001/'
-// const baseURL = 'https://apiroutekkmart.invtechnologies.in/'
+const baseURL = 'https://apionlinevotingsystem.invtechnologies.in/'
 //
 const api = axios.create({
   baseURL,

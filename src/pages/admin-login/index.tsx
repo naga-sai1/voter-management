@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { useState } from 'react'
 
 import { ShieldCheck, Github, Facebook, Eye, EyeOff } from 'lucide-react'

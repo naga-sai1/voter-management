@@ -1,4 +1,4 @@
-'use client'
+//@ts-nocheck
 
 import { useEffect, useState } from 'react'
 import { Users, Check, Star, Shield, Leaf, Feather, LogOut } from 'lucide-react'

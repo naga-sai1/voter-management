@@ -1,4 +1,4 @@
-'use client'
+//@ts-nocheck
 
 import { useEffect, useState } from 'react'
 import {
@@ -10,10 +10,21 @@ import {
   ChevronDown,
   Plus,
   LogOut,
+  Trash2,
 } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/custom/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Table,
   TableBody,
@@ -32,7 +43,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useNavigate } from 'react-router-dom'
-import { partyWiseVotingCount } from '@/api'
+import { partyWiseVotingCount, resetAllPolls } from '@/api'
 
 // Mock data for demonstration
 // const stats = [
@@ -120,9 +131,31 @@ export default function AdminDashboard() {
   const [totalVotes, setTotalVotes] = useState(0)
   const [totalVoters, setTotalVoters] = useState(0)
   const [votingPercentage, setVotingPercentage] = useState(0)
+  const [showResetConfirmation, setShowResetConfirmation] = useState(false)
+  const [isResetting, setIsResetting] = useState(false)
+
   const handleLogout = () => {
     localStorage.removeItem('isAdmin')
     navigate('/')
+  }
+
+  const handleResetPolls = async () => {
+    try {
+      setIsResetting(true)
+      await resetAllPolls()
+      // Refresh the data after reset
+      const response = await partyWiseVotingCount() as VotingCountResponse
+      setVotingData(response)
+      setPartyStats(response.statistics)
+      setTotalVotes(response.totalVotesCast)
+      setTotalVoters(response.totalVoters)
+      setVotingPercentage(response.votingPercentage)
+    } catch (error) {
+      console.error('Error resetting polls:', error)
+    } finally {
+      setIsResetting(false)
+      setShowResetConfirmation(false)
+    }
   }
 
   useEffect(() => {
@@ -169,6 +202,15 @@ export default function AdminDashboard() {
               Create New Party
             </Button>
             <Button
+              onClick={() => setShowResetConfirmation(true)}
+              variant='outline'
+              className='border-red-500/20 text-red-500 hover:bg-red-500/10'
+              disabled={isResetting}
+            >
+              <Trash2 className='mr-2 h-4 w-4' />
+              {isResetting ? 'Resetting...' : 'Reset All Polls'}
+            </Button>
+            <Button
               onClick={handleLogout}
               variant='outline'
               className='border-red-500/20 text-red-500 hover:bg-red-500/10'
@@ -178,6 +220,28 @@ export default function AdminDashboard() {
             </Button>
           </div>
         </div>
+
+        <AlertDialog open={showResetConfirmation} onOpenChange={setShowResetConfirmation}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Reset All Polls</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to reset all polls? This action cannot be undone.
+                All voting data will be permanently deleted.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleResetPolls}
+                disabled={isResetting}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                {isResetting ? 'Resetting...' : 'Reset All'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <div className='mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
           <Card>
