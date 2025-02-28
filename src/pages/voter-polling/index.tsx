@@ -246,7 +246,20 @@ export default function VoterPolling() {
             )}
           </div>
         </form>
-      ) : null}
+      ) : (
+        <Card>
+          <CardContent className='p-6'>
+            <div className='text-center'>
+              <h2 className='mb-2 text-2xl font-semibold text-gray-600'>
+                No Polls Available
+              </h2>
+              <p className='text-gray-600'>
+                There are currently no polls conducted for your state.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <SuccessModal
         open={showSuccessModal}
