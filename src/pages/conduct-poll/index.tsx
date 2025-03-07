@@ -94,8 +94,8 @@ export default function ConductPoll() {
       start_date: '',
       end_date: '',
       state_id: '',
-      party_list: []
-    }
+      party_list: [],
+    },
   })
 
   const watchedState = form.watch('state_id')
@@ -106,7 +106,7 @@ export default function ConductPoll() {
         setLoading(true)
         const [partiesRes, statesRes] = await Promise.all([
           getAllParties(),
-          getAllStates()
+          getAllStates(),
         ])
         setParties(partiesRes.parties || [])
         setStates(statesRes.states || [])
@@ -128,10 +128,12 @@ export default function ConductPoll() {
     console.log('All parties:', parties)
 
     if (stateId) {
-      const filtered = parties.filter(party => {
+      const filtered = parties.filter((party) => {
         const partyStateId = party.state_id?.toString()
         const formStateId = stateId?.toString()
-        console.log(`Comparing party state_id: ${partyStateId} with form state_id: ${formStateId}`)
+        console.log(
+          `Comparing party state_id: ${partyStateId} with form state_id: ${formStateId}`
+        )
         return partyStateId === formStateId
       })
       console.log('Filtered parties:', filtered)
@@ -272,12 +274,19 @@ export default function ConductPoll() {
                       >
                         <SelectTrigger className='border-white/20 bg-white/10 text-white'>
                           <SelectValue placeholder='Select a state'>
-                            {states.find(state => state.id.toString() === field.value)?.name}
+                            {
+                              states.find(
+                                (state) => state.id.toString() === field.value
+                              )?.name
+                            }
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {states.map((state) => (
-                            <SelectItem key={state.id} value={state.id.toString()}>
+                            <SelectItem
+                              key={state.id}
+                              value={state.id.toString()}
+                            >
                               {state.name}
                             </SelectItem>
                           ))}
@@ -393,7 +402,10 @@ export default function ConductPoll() {
                   </DialogDescription>
                 </DialogHeader>
                 <div className='mt-4 flex justify-end'>
-                  <Button className='bg-violet-600 hover:bg-violet-700'>
+                  <Button
+                    onClick={() => setShowSuccessModal(false)}
+                    className='bg-violet-600 hover:bg-violet-700'
+                  >
                     Close
                   </Button>
                 </div>
