@@ -202,6 +202,13 @@ export default function AdminDashboard() {
               Create New Party
             </Button>
             <Button
+              onClick={() => navigate('/add-voter')}
+              className='bg-green-600 text-white hover:bg-green-700'
+            >
+              <Plus className='mr-2 h-4 w-4' />
+              Add Voter
+            </Button>
+            <Button
               onClick={() => setShowResetConfirmation(true)}
               variant='outline'
               className='border-red-500/20 text-red-500 hover:bg-red-500/10'

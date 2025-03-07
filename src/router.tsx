@@ -92,6 +92,12 @@ const router = createBrowserRouter([
       Component: (await import('./pages/conduct-poll')).default,
     }),
   },
+  {
+    path: '/add-voter',
+    lazy: async () => ({
+      Component: (await import('./pages/add-voter/index.tsx')).default,
+    }),
+  },
 
   // Main routes
   {
