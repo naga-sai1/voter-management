@@ -53,6 +53,14 @@ interface CastVoteResponse {
   message: string
 }
 
+interface Voter {
+  voter_id: number
+  name: string
+  aadhar: string
+  phone_no: string
+  state_id: number
+}
+
 export const resetAllPolls = () =>
   api.delete('/reset_all_polls').then((response) => response.data)
 
@@ -79,6 +87,9 @@ export const loginVoter = (data: { aadhar: string; phone_no: string }) =>
 
 export const getAllStates = () =>
   api.get('/get_all_states').then((response) => response.data)
+
+export const addVoter = (data: FormData) =>
+  api.post('/add_voter', data).then((response) => response.data)
 
 export const createPoll = (data: FormData) =>
   axios
