@@ -1,4 +1,3 @@
-
 import { ArrowRight, ShieldCheck, Users } from 'lucide-react'
 import { Button } from '@/components/custom/button'
 import { Card } from '@/components/ui/card'
@@ -16,8 +15,8 @@ export default function Choose() {
       {/* Content */}
       <div className='container relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-4 py-16'>
         <div className='mb-16 space-y-4 text-center'>
-          <h1 className='bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-4xl font-bold tracking-tight text-transparent md:text-6xl lg:text-7xl'>
-            Voter Management System
+          <h1 className='bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-3xl font-bold tracking-tight text-transparent md:text-5xl lg:text-7xl'>
+            Aadhar enabled online voting system using SHA 256
           </h1>
           <p className='mx-auto max-w-2xl text-lg text-gray-400 md:text-xl'>
             Secure, transparent, and efficient electoral process management
@@ -57,7 +56,7 @@ export default function Choose() {
             <div className='absolute inset-0 bg-gradient-to-br from-cyan-600/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
             <div className='relative p-8'>
               <div className='mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/20'>
-                <Users className='h-6 w-6 text-cyan-400' />
+                <img src='.\public\images\voter-side-logo.png' className='h-6 w-6 text-cyan-400' alt='User Icon' />
               </div>
               <h2 className='mb-2 text-2xl font-semibold text-white transition-colors group-hover:text-cyan-400'>
                 Voter Portal
