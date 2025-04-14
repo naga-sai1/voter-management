@@ -77,7 +77,7 @@ export default function VoterLogin() {
           <div className='h-64 w-64 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-400 to-purple-400 p-[2px]'>
             <div className='flex h-full w-full items-center justify-center rounded-xl bg-white'>
               {/* <Users className='h-32 w-32 text-white' /> */}
-              <img src='/images/voter-side-logo.png' className='h-32 w-32 text-cyan-400' alt='User Icon' />
+              <img src='./images/voter-side-logo.png' className='h-32 w-32 text-cyan-400' alt='User Icon' />
             </div>
           </div>
           <blockquote className='max-w-md text-center text-lg text-white/80'>

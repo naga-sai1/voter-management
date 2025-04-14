@@ -56,7 +56,7 @@ export default function Choose() {
             <div className='absolute inset-0 bg-gradient-to-br from-cyan-600/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
             <div className='relative p-8'>
               <div className='mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/20'>
-                <img src='/images/voter-side-logo.png' className='h-6 w-6 text-cyan-400' alt='User Icon' />
+                <img src='./images/voter-side-logo.png' className='h-6 w-6 text-cyan-400' alt='User Icon' />
               </div>
               <h2 className='mb-2 text-2xl font-semibold text-black transition-colors group-hover:text-cyan-400'>
                 Voter Portal
