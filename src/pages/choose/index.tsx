@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom'
 
 export default function Choose() {
   return (
-    <div className='relative min-h-screen w-full overflow-hidden bg-[#0A0F1C]'>
+    <div className='relative min-h-screen w-full overflow-hidden bg-white'>
       {/* Animated background gradients */}
-      <div className='absolute inset-0 overflow-hidden'>
-        <div className='absolute -left-[20%] -top-[40%] h-[70%] w-[70%] animate-pulse rounded-full bg-gradient-to-r from-violet-600/30 to-purple-600/30 blur-3xl' />
-        <div className='absolute -bottom-[40%] -right-[20%] h-[70%] w-[70%] animate-pulse rounded-full bg-gradient-to-r from-blue-600/30 to-cyan-600/30 blur-3xl delay-1000' />
-      </div>
+      {/* <div className='absolute inset-0 overflow-hidden'>
+        <div className='absolute -left-[20%] -top-[40%] h-[70%] w-[70%] animate-pulse rounded-full bg-gradient-to-r from-orange-600/30 to-green-600/30 blur-3xl' />
+        <div className='absolute -bottom-[40%] -right-[20%] h-[70%] w-[70%] animate-pulse rounded-full bg-gradient-to-r from-orange-600/30 to--600/30 blur-3xl delay-1000' />
+      </div> */}
 
       {/* Content */}
       <div className='container relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-4 py-16'>
@@ -32,7 +32,7 @@ export default function Choose() {
               <div className='mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-violet-500/20'>
                 <ShieldCheck className='h-6 w-6 text-violet-400' />
               </div>
-              <h2 className='mb-2 text-2xl font-semibold text-white transition-colors group-hover:text-violet-400'>
+              <h2 className='mb-2 text-2xl font-semibold text-black transition-colors group-hover:text-violet-400'>
                 Admin Portal
               </h2>
               <p className='mb-6 text-gray-400'>
@@ -58,7 +58,7 @@ export default function Choose() {
               <div className='mb-6 flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/20'>
                 <img src='.\public\images\voter-side-logo.png' className='h-6 w-6 text-cyan-400' alt='User Icon' />
               </div>
-              <h2 className='mb-2 text-2xl font-semibold text-white transition-colors group-hover:text-cyan-400'>
+              <h2 className='mb-2 text-2xl font-semibold text-black transition-colors group-hover:text-cyan-400'>
                 Voter Portal
               </h2>
               <p className='mb-6 text-gray-400'>

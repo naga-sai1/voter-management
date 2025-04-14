@@ -182,7 +182,7 @@ export default function AdminDashboard() {
   }, [])
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#0A0F1C] to-[#1A1F2C] p-8'>
+    <div className='min-h-screen p-8' style={{ background: 'linear-gradient(to bottom, #f57716, #ffffff, #04cf33)' }}>
       <div className='mx-auto max-w-7xl'>
         <div className='mb-8 flex items-center justify-between'>
           <h1 className='text-3xl font-bold text-white'>Admin Dashboard</h1>
@@ -292,9 +292,9 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        <Card className='border-white/20 bg-white/5'>
+        <Card className='border-white/20 bg-black/5'>
           <CardHeader>
-            <CardTitle className='text-xl font-bold text-white'>
+            <CardTitle className='text-xl font-bold text-black'>
               Party-wise Voting Count
             </CardTitle>
           </CardHeader>

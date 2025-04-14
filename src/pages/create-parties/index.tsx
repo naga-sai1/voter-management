@@ -132,7 +132,7 @@ const formSchema = z.object({
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#0A0F1C] to-[#1A1F2C] p-8'>
+    <div className='min-h-screen p-8' style={{ background: 'linear-gradient(to bottom, #f57716, #ffffff, #04cf33)' }}>
       <Button
         onClick={() => window.history.back()}
         variant='ghost'
@@ -142,7 +142,7 @@ const formSchema = z.object({
         Back
       </Button>
 
-      <Card className='mx-auto max-w-2xl bg-white/5 backdrop-blur-sm'>
+      <Card className='mx-auto max-w-2xl bg-black/5 backdrop-blur-sm'>
         <CardContent className='p-8'>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -151,7 +151,7 @@ const formSchema = z.object({
             className='mb-8 flex items-center gap-2'
           >
             <ShieldCheck className='h-8 w-8 text-violet-400' />
-            <span className='text-2xl font-semibold text-white'>
+            <span className='text-2xl font-semibold text-black'>
               Create Voting Party
             </span>
           </motion.div>
@@ -163,12 +163,12 @@ const formSchema = z.object({
                 name='partyName'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Party Name</FormLabel>
+                    <FormLabel className='text-black'>Party Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder='Enter party name'
                         {...field}
-                        className='border-white/20 bg-white/10 text-white placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
                       />
                     </FormControl>
                     <FormMessage />
@@ -180,14 +180,14 @@ const formSchema = z.object({
                 name='abbreviation'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>
+                    <FormLabel className='text-black'>
                       Party Abbreviation
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder='Enter party abbreviation'
                         {...field}
-                        className='border-white/20 bg-white/10 text-white placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
                       />
                     </FormControl>
                     <FormMessage />
@@ -199,13 +199,13 @@ const formSchema = z.object({
                 name='state'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>State</FormLabel>
+                    <FormLabel className='text-black'>State</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'>
+                        <SelectTrigger className='border-gray/20 bg-white/10 text-black focus:border-violet-400 focus:ring-violet-400'>
                           <SelectValue placeholder='Select a state' />
                         </SelectTrigger>
                       </FormControl>
@@ -229,7 +229,7 @@ const formSchema = z.object({
                 name='partyLogo'
                 render={({ field: { value, ...field } }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Party Logo</FormLabel>
+                    <FormLabel className='text-black'>Party Logo</FormLabel>
                     <FormControl>
                       <div className='flex items-center space-x-4'>
                         <div className='relative'>
@@ -242,7 +242,7 @@ const formSchema = z.object({
                           />
                           <label
                             htmlFor='logo-upload'
-                            className='flex h-32 w-32 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-white/20 transition-colors hover:border-violet-400'
+                            className='flex h-32 w-32 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray/20 transition-colors hover:border-violet-400'
                           >
                             {logoPreview ? (
                               <img
@@ -256,7 +256,7 @@ const formSchema = z.object({
                           </label>
                         </div>
                         <div className='flex-1'>
-                          <FormDescription className='mb-2 text-gray-400'>
+                          <FormDescription className='mb-2 text-gray-600'>
                             Upload a logo for the party (optional)
                           </FormDescription>
                           <Button

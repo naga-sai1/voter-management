@@ -66,9 +66,9 @@ export default function VoterLogin() {
   }
 
   return (
-    <div className='grid min-h-screen bg-[#0A0F1C] lg:grid-cols-2'>
+    <div className='grid min-h-screen bg-[#da9241] lg:grid-cols-2'>
       {/* Left side */}
-      <div className='relative hidden flex-col items-center justify-center bg-black lg:flex'>
+      <div className='relative hidden flex-col items-center justify-center bg-orange lg:flex'>
         <div className='absolute inset-0'>
           <div className='absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-transparent' />
         </div>
@@ -93,8 +93,9 @@ export default function VoterLogin() {
       </div>
 
       {/* Right side */}
-      <div className='flex items-center justify-center bg-gradient-to-br from-gray-900 to-black p-8'>
-        <div className='w-full max-w-md space-y-8 rounded-2xl bg-white/5 p-8 backdrop-blur-sm'>
+      <div className='flex items-center justify-center p-8' style={{ background: 'linear-gradient(to bottom, #f57716, #ffffff, #04cf33)' }}>
+      {/* bg-gradient-to-br from-orange-900 to-green-300 */}
+        <div className='w-full max-w-md space-y-8 rounded-2xl bg-black/5 p-8 backdrop-blur-sm'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2 lg:hidden'>
               <Users className='h-8 w-8 text-cyan-400' />
@@ -104,7 +105,7 @@ export default function VoterLogin() {
             </div>
             <Button
               variant='ghost'
-              className='text-gray-400 hover:bg-white/10 hover:text-white'
+              className='text-gray-600 hover:bg-white/10 hover:text-white'
               onClick={() => navigate('/')}
             >
               Back to Home
@@ -112,7 +113,7 @@ export default function VoterLogin() {
           </div>
 
           <div className='space-y-2'>
-            <h1 className='text-3xl font-bold text-white'>Voter Login</h1>
+            <h1 className='text-3xl font-bold text-black'>Voter Login</h1>
             <p className='text-gray-400'>
               Enter your Aadhar number and phone number to access your account
             </p>
@@ -120,7 +121,7 @@ export default function VoterLogin() {
 
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='space-y-2'>
-              <Label htmlFor='aadhar' className='text-gray-200'>
+              <Label htmlFor='aadhar' className='text-black'>
                 Aadhar Number
               </Label>
               <Input
@@ -129,13 +130,13 @@ export default function VoterLogin() {
                 value={aadhar}
                 onChange={handleAadharChange}
                 placeholder='XXXX XXXX XXXX'
-                className='border-white/20 bg-white/10 text-white placeholder:text-gray-500'
+                className='border-white/20 bg-white/10 text-black placeholder:text-gray-500'
                 required
               />
             </div>
 
             <div className='space-y-2'>
-              <Label htmlFor='phone' className='text-gray-200'>
+              <Label htmlFor='phone' className='text-black'>
                 Phone Number
               </Label>
               <Input
@@ -144,7 +145,7 @@ export default function VoterLogin() {
                 value={phone}
                 onChange={handlePhoneChange}
                 placeholder='Enter your phone number'
-                className='border-white/20 bg-white/10 text-white placeholder:text-gray-500'
+                className='border-white/20 bg-white/10 text-black placeholder:text-gray-500'
                 required
               />
             </div>
@@ -171,7 +172,7 @@ export default function VoterLogin() {
             </Button>
           </form>
 
-          <p className='text-center text-sm text-gray-400'>
+          <p className='text-center text-sm '>
             By clicking login, you agree to our{' '}
             <Link
               to='#'

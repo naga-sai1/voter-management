@@ -160,7 +160,7 @@ export default function ConductPoll() {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#0A0F1C] to-[#1A1F2C] p-8'>
+    <div className='min-h-screen p-8' style={{ background: 'linear-gradient(to bottom, #f57716, #ffffff, #04cf33)' }}>
       <Button
         onClick={() => window.history.back()}
         variant='ghost'
@@ -179,7 +179,7 @@ export default function ConductPoll() {
             className='mb-8 flex items-center gap-2'
           >
             <ShieldCheck className='h-8 w-8 text-violet-400' />
-            <span className='text-2xl font-semibold text-white'>
+            <span className='text-2xl font-semibold text-black'>
               Conduct State Poll
             </span>
           </motion.div>
@@ -191,11 +191,11 @@ export default function ConductPoll() {
                 name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Poll Name</FormLabel>
+                    <FormLabel className='text-black'>Poll Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder='Enter poll name'
-                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black focus:border-violet-400 focus:ring-violet-400'
                         {...field}
                       />
                     </FormControl>
@@ -209,11 +209,11 @@ export default function ConductPoll() {
                 name='description'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Description</FormLabel>
+                    <FormLabel className='text-black'>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder='Optional poll description'
-                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black focus:border-violet-400 focus:ring-violet-400'
                         {...field}
                       />
                     </FormControl>
@@ -227,11 +227,11 @@ export default function ConductPoll() {
                 name='start_date'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Start Date</FormLabel>
+                    <FormLabel className='text-black'>Start Date</FormLabel>
                     <FormControl>
                       <Input
                         type='date'
-                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black focus:border-violet-400 focus:ring-violet-400'
                         {...field}
                       />
                     </FormControl>
@@ -245,11 +245,11 @@ export default function ConductPoll() {
                 name='end_date'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>End Date</FormLabel>
+                    <FormLabel className='text-black'>End Date</FormLabel>
                     <FormControl>
                       <Input
                         type='date'
-                        className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black focus:border-violet-400 focus:ring-violet-400'
                         {...field}
                       />
                     </FormControl>
@@ -263,7 +263,7 @@ export default function ConductPoll() {
                 name='state_id'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>State</FormLabel>
+                    <FormLabel className='text-black'>State</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={(value) => {
@@ -272,7 +272,7 @@ export default function ConductPoll() {
                         }}
                         value={field.value}
                       >
-                        <SelectTrigger className='border-white/20 bg-white/10 text-white'>
+                        <SelectTrigger className='border-gray/20 bg-white/10 text-black'>
                           <SelectValue placeholder='Select a state'>
                             {
                               states.find(
@@ -303,13 +303,13 @@ export default function ConductPoll() {
                 name='party_list'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Parties</FormLabel>
+                    <FormLabel className='text-black'>Parties</FormLabel>
                     <FormControl>
                       <div className='space-y-2'>
                         {filteredParties.map((party) => (
                           <div
                             key={party.id}
-                            className='flex items-center space-x-2 rounded-lg border border-white/10 bg-white/5 p-3'
+                            className='flex items-center space-x-2 rounded-lg border border-gray/10 bg-gray/5 p-3'
                           >
                             <Checkbox
                               checked={field.value?.includes(party.id)}
@@ -329,7 +329,7 @@ export default function ConductPoll() {
                                   className='h-8 w-8 rounded-full object-cover'
                                 />
                               )}
-                              <span className='text-sm text-white'>
+                              <span className='text-sm text-black'>
                                 {party.name} ({party.abbreviation})
                               </span>
                             </div>

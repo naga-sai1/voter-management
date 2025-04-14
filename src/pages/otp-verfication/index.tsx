@@ -58,12 +58,12 @@ export default function OtpVerification() {
   }
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-[#0A0F1C] p-8'>
-      <div className='w-full max-w-md space-y-8 rounded-2xl bg-white/5 p-8 backdrop-blur-sm'>
+    <div className='flex min-h-screen items-center justify-center p-8' style={{ background: 'linear-gradient(to bottom, #f57716, #ffffff, #04cf33)' }}>
+      <div className='w-full max-w-md space-y-8 rounded-2xl bg-black/5 p-8 backdrop-blur-sm'>
         <div className='flex items-center justify-between'>
           <Button
             variant='ghost'
-            className='text-gray-400 hover:bg-white/10 hover:text-white'
+            className='text-gray-700 hover:bg-white/10 hover:text-black'
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className='mr-2 h-4 w-4' />
@@ -72,15 +72,15 @@ export default function OtpVerification() {
         </div>
 
         <div className='space-y-2'>
-          <h1 className='text-3xl font-bold text-white'>OTP Verification</h1>
-          <p className='text-gray-400'>
+          <h1 className='text-3xl font-bold text-black'>OTP Verification</h1>
+          <p className='text-gray-700'>
             Enter the 6-digit code sent to your phone
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className='space-y-6'>
           <div className='space-y-2'>
-            <Label htmlFor='otp' className='text-gray-200'>
+            <Label htmlFor='otp' className='text-black'>
               Enter OTP
             </Label>
             <div className='flex gap-2'>
@@ -91,7 +91,7 @@ export default function OtpVerification() {
                   maxLength={1}
                   value={data}
                   onChange={(e) => handleChange(e.target, index)}
-                  className='h-12 w-12 border-white/20 bg-white/10 text-center text-2xl text-white'
+                  className='h-12 w-12 border-gray/20 bg-gray/10 text-center text-2xl text-black'
                   required
                 />
               ))}
@@ -120,9 +120,9 @@ export default function OtpVerification() {
           </Button>
         </form>
 
-        <p className='text-center text-sm text-gray-400'>
+        <p className='text-center text-sm text-gray-700'>
           Didn't receive the code?{' '}
-          <button className='text-cyan-400 underline hover:text-cyan-300'>
+          <button className='text-cyan-700 underline hover:text-cyan-300'>
             Resend OTP
           </button>
         </p>

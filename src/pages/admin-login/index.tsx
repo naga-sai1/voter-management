@@ -41,9 +41,9 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className='grid min-h-screen bg-[#0A0F1C] lg:grid-cols-2'>
+    <div className='grid min-h-screen bg-[#da9241] lg:grid-cols-2'>
       {/* Left side */}
-      <div className='relative hidden flex-col items-center justify-center bg-black lg:flex'>
+      <div className='relative hidden flex-col items-center justify-center bg-orange lg:flex'>
         <div className='absolute inset-0'>
           <div className='absolute inset-0 bg-gradient-to-br from-violet-600/20 to-transparent' />
         </div>
@@ -67,8 +67,8 @@ export default function AdminLogin() {
       </div>
 
       {/* Right side */}
-      <div className='flex items-center justify-center bg-gradient-to-br from-gray-900 to-black p-8'>
-        <div className='w-full max-w-md space-y-8 rounded-2xl bg-white/5 p-8 backdrop-blur-sm'>
+      <div className='flex items-center justify-center p-8' style={{ background: 'linear-gradient(to bottom, #f57716, #ffffff, #04cf33)' }}>
+        <div className='w-full max-w-md space-y-8 rounded-2xl bg-black/5 p-8 backdrop-blur-sm'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2 lg:hidden'>
               <ShieldCheck className='h-8 w-8 text-violet-400' />
@@ -78,7 +78,7 @@ export default function AdminLogin() {
             </div>
             <Button
               variant='ghost'
-              className='text-gray-400 hover:bg-white/10 hover:text-white'
+              className='text-gray-600 hover:bg-white/10 hover:text-white'
               onClick={() => navigate('/')}
             >
               Back to Home
@@ -86,7 +86,7 @@ export default function AdminLogin() {
           </div>
 
           <div className='space-y-2'>
-            <h1 className='text-3xl font-bold text-white'>Admin Login</h1>
+            <h1 className='text-3xl font-bold text-black'>Admin Login</h1>
             <p className='text-gray-400'>
               Enter your credentials to access the admin dashboard
             </p>
@@ -94,7 +94,7 @@ export default function AdminLogin() {
 
           <form className='space-y-6' onSubmit={handleSubmit}>
             <div className='space-y-2'>
-              <Label htmlFor='userId' className='text-gray-200'>
+              <Label htmlFor='userId' className='text-black'>
                 User ID
               </Label>
               <Input
@@ -109,7 +109,7 @@ export default function AdminLogin() {
 
             <div className='space-y-2'>
               <div className='flex items-center justify-between'>
-                <Label htmlFor='password' className='text-gray-200'>
+                <Label htmlFor='password' className='text-black'>
                   Password
                 </Label>
                 <Button
@@ -123,7 +123,7 @@ export default function AdminLogin() {
                 <Input
                   id='password'
                   type={showPassword ? 'text' : 'password'}
-                  className='border-white/20 bg-white/10 pr-10 text-white'
+                  className='border-white/20 bg-white/10 pr-10 text-black'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -156,7 +156,7 @@ export default function AdminLogin() {
             )}
           </form>
 
-          <p className='text-center text-sm text-gray-400'>
+          <p className='text-center text-sm'>
             By clicking login, you agree to our{' '}
             <Link
               to='/terms'

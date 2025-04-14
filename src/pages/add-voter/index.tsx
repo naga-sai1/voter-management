@@ -132,7 +132,7 @@ function AddVoter() {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#0A0F1C] to-[#1A1F2C] p-8'>
+    <div className='min-h-screen p-8' style={{ background: 'linear-gradient(to bottom, #f57716, #ffffff, #04cf33)' }}>
       <Button
         onClick={() => window.history.back()}
         variant='ghost'
@@ -151,7 +151,7 @@ function AddVoter() {
             className='mb-8 flex items-center gap-2'
           >
             <ShieldCheck className='h-8 w-8 text-violet-400' />
-            <span className='text-2xl font-semibold text-white'>Add Voter</span>
+            <span className='text-2xl font-semibold text-black'>Add Voter</span>
           </motion.div>
 
           <Form {...form}>
@@ -161,12 +161,12 @@ function AddVoter() {
                 name='voterName'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>Voter Name</FormLabel>
+                    <FormLabel className='text-black'>Voter Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder='Enter voter name'
                         {...field}
-                        className='border-white/20 bg-white/10 text-white placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
                       />
                     </FormControl>
                     <FormMessage />
@@ -178,7 +178,7 @@ function AddVoter() {
                 name='aadhaarNumber'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>
+                    <FormLabel className='text-black'>
                       Voter Aadhaar Number
                     </FormLabel>
                     <FormControl>
@@ -191,7 +191,7 @@ function AddVoter() {
                           field.onChange(formatted)
                         }}
                         maxLength={14} // 12 digits + 2 spaces
-                        className='border-white/20 bg-white/10 text-white placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-white placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
                       />
                     </FormControl>
                     <FormMessage />
@@ -203,7 +203,7 @@ function AddVoter() {
                 name='phoneNumber'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>
+                    <FormLabel className='text-black'>
                       Voter Phone Number
                     </FormLabel>
                     <FormControl>
@@ -217,7 +217,7 @@ function AddVoter() {
                           }
                         }}
                         {...field}
-                        className='border-white/20 bg-white/10 text-white placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
+                        className='border-gray/20 bg-white/10 text-black placeholder:text-gray-500 focus:border-violet-400 focus:ring-violet-400'
                       />
                     </FormControl>
                     <FormMessage />
@@ -229,13 +229,13 @@ function AddVoter() {
                 name='state'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-gray-200'>State</FormLabel>
+                    <FormLabel className='text-black'>State</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className='border-white/20 bg-white/10 text-white focus:border-violet-400 focus:ring-violet-400'>
+                        <SelectTrigger className='border-gray/20 bg-white/10 text-black focus:border-violet-400 focus:ring-violet-400'>
                           <SelectValue placeholder='Select a state' />
                         </SelectTrigger>
                       </FormControl>
