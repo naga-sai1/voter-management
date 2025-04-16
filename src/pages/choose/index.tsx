@@ -16,7 +16,7 @@ export default function Choose() {
       <div className='container relative mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-4 py-16'>
         <div className='mb-16 space-y-4 text-center'>
           <h1 className='bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-3xl font-bold tracking-tight text-transparent md:text-5xl lg:text-7xl'>
-            Aadhar enabled online voting system using SHA 256
+          Aadhaar-Enabled Online Voting System Using SHA-256
           </h1>
           <p className='mx-auto max-w-2xl text-lg text-gray-400 md:text-xl'>
             Secure, transparent, and efficient electoral process management
